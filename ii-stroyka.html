@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Подготовка к магистратуре: ИИ в строительстве</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(145deg, #f0f4f8 0%, #d9e2ec 100%);
+            padding: 20px;
+        }
+        .container {
+            max-width: 860px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(12px);
+            border-radius: 40px;
+            padding: 40px 35px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .progress-text {
+            font-weight: 600;
+            font-size: 1.05rem;
+            color: #1e293b;
+            background: #e9edf2;
+            padding: 8px 20px;
+            border-radius: 60px;
+        }
+        .score-text {
+            font-weight: 600;
+            font-size: 1rem;
+            color: #0b3b5c;
+            background: #d0e2f2;
+            padding: 8px 20px;
+            border-radius: 60px;
+        }
+        .progress-bar-wrap {
+            width: 100%;
+            height: 8px;
+            background: #d1d9e6;
+            border-radius: 20px;
+            margin: 6px 0 22px 0;
+            overflow: hidden;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #2563eb, #7c3aed);
+            border-radius: 20px;
+            transition: width 0.5s ease;
+        }
+        .question-type {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #6b7280;
+            background: #e5e7eb;
+            display: inline-block;
+            padding: 2px 14px;
+            border-radius: 30px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+        .question-number {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #475569;
+            margin-bottom: 4px;
+        }
+        .question-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #0f172a;
+            line-height: 1.4;
+            margin-bottom: 22px;
+            min-height: 60px;
+        }
+        .options-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 24px;
+        }
+        .option-btn {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 14px 20px;
+            font-size: 1.02rem;
+            font-weight: 500;
+            color: #1e293b;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+        .option-btn:hover:not(.disabled) {
+            background: #f1f5f9;
+            border-color: #94a3b8;
+            transform: scale(1.005);
+        }
+        .option-btn .letter {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            background: #e9edf2;
+            font-weight: 700;
+            color: #334155;
+            flex-shrink: 0;
+            transition: 0.2s;
+        }
+        .option-btn.correct {
+            border-color: #16a34a;
+            background: #dcfce7;
+            box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.15);
+        }
+        .option-btn.correct .letter {
+            background: #16a34a;
+            color: white;
+        }
+        .option-btn.wrong {
+            border-color: #dc2626;
+            background: #fee2e2;
+            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15);
+        }
+        .option-btn.wrong .letter {
+            background: #dc2626;
+            color: white;
+        }
+        .option-btn.selected {
+            border-color: #3b82f6;
+            background: #eff6ff;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        }
+        .option-btn.selected .letter {
+            background: #3b82f6;
+            color: white;
+        }
+        .option-btn.disabled {
+            cursor: default;
+            opacity: 0.6;
+        }
+        .option-btn.correct.disabled, .option-btn.wrong.disabled, .option-btn.selected.disabled {
+            opacity: 1;
+        }
+
+        .input-area {
+            margin: 10px 0 20px 0;
+        }
+        .input-area input {
+            width: 100%;
+            padding: 16px 20px;
+            font-size: 1.05rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 16px;
+            background: #f8fafc;
+            transition: 0.2s;
+            outline: none;
+        }
+        .input-area input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        }
+        .input-area input:disabled {
+            background: #f1f5f9;
+            opacity: 0.7;
+        }
+        .input-area input.correct-input {
+            border-color: #16a34a;
+            background: #dcfce7;
+        }
+        .input-area input.wrong-input {
+            border-color: #dc2626;
+            background: #fee2e2;
+        }
+        .input-feedback {
+            margin-top: 8px;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+        .input-feedback.correct { color: #16a34a; }
+        .input-feedback.wrong { color: #dc2626; }
+        .submit-text-btn {
+            margin-top: 10px;
+            padding: 12px 30px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 60px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: 0.2s;
+        }
+        .submit-text-btn:hover:not(:disabled) {
+            background: #1d4ed8;
+            transform: scale(1.02);
+        }
+        .submit-text-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .action-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+            flex-wrap: wrap;
+            gap: 14px;
+        }
+        .next-btn {
+            background: #1e293b;
+            color: white;
+            border: none;
+            padding: 14px 40px;
+            border-radius: 60px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.25s;
+            box-shadow: 0 6px 14px rgba(30, 41, 59, 0.25);
+            letter-spacing: 0.3px;
+            margin-left: auto;
+        }
+        .next-btn:hover:not(:disabled) {
+            background: #0f172a;
+            transform: scale(1.02);
+            box-shadow: 0 10px 20px -8px rgba(0, 0, 0, 0.3);
+        }
+        .next-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        .reset-btn {
+            background: transparent;
+            border: 2px solid #94a3b8;
+            color: #334155;
+            padding: 12px 24px;
+            border-radius: 60px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 0.95rem;
+        }
+        .reset-btn:hover {
+            background: #e9edf2;
+            border-color: #64748b;
+        }
+
+        .finish-box {
+            text-align: center;
+            padding: 30px 10px;
+        }
+        .finish-box h2 {
+            font-size: 2.2rem;
+            color: #0f172a;
+        }
+        .finish-box .big-score {
+            font-size: 4rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin: 20px 0;
+        }
+        .finish-box .score-detail {
+            font-size: 1.15rem;
+            color: #475569;
+            margin: 6px 0;
+        }
+        .finish-box .score-detail span {
+            font-weight: 700;
+            color: #0f172a;
+        }
+        .finish-box .reset-btn {
+            margin-top: 30px;
+            padding: 16px 50px;
+            background: #1e293b;
+            color: white;
+            border: none;
+        }
+        .finish-box .reset-btn:hover {
+            background: #0f172a;
+        }
+        .multi-hint {
+            font-size: 0.9rem;
+            color: #2563eb;
+            font-weight: 500;
+            margin-top: 6px;
+            background: #eff6ff;
+            padding: 8px 16px;
+            border-radius: 12px;
+            border: 1px dashed #93c5fd;
+        }
+
+        @media (max-width: 600px) {
+            .container { padding: 20px 16px; }
+            .question-text { font-size: 1.2rem; }
+            .option-btn { font-size: 0.92rem; padding: 12px 14px; }
+            .next-btn { width: 100%; justify-content: center; }
+            .action-row { flex-direction: column; align-items: stretch; }
+            .reset-btn { text-align: center; }
+        }
+    </style>
+</head>
+<body>
+<div class="container" id="app">
+    <div class="header">
+        <span class="progress-text" id="progressText">Вопрос 1 / 70</span>
+        <span class="score-text" id="scoreText">⭐ 0.0 / 70</span>
+    </div>
+    <div class="progress-bar-wrap">
+        <div class="progress-bar-fill" id="progressFill"></div>
+    </div>
+
+    <div id="mainContent">
+        <div class="question-type" id="qType">Выбор ответа</div>
+        <div class="question-number" id="qNum">Вопрос №1</div>
+        <div class="question-text" id="qText">Загрузка...</div>
+        <div id="optionsContainer"></div>
+        <div class="action-row">
+            <button class="reset-btn" id="resetBtn">⟳ Заново</button>
+            <button class="next-btn" id="nextBtn" disabled>Далее →</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ================================================================
+    //  ВСЕ ВОПРОСЫ (70 шт)
+    // ================================================================
+    const QUESTIONS_RAW = [
+        // 1
+        { type: 'choice', question: "Искусственный интеллект (ИИ) представляет собой:", options: ["Систему или машину, которые могут имитировать человеческое поведение, чтобы выполнять задачи, и постепенно обучаться, используя собираемую информацию", "Базу данных", "Набор тестов для проверки когнитивных способностей человека"], correct: 0 },
+        // 2
+        { type: 'choice', question: "Машинное обучение фокусируется на:", options: ["Хранении данных в систематизированной форме", "Обновлении и анализе данных", "Создании систем автоматизации, которые обучаются посредством обработки данных"], correct: 2 },
+        // 3
+        { type: 'choice', question: "Data Science представляет собой:", options: ["Обеспечение доступа к массивам данных", "Междисциплинарную смесь статистических выводов, анализа данных, разработки алгоритмов и технологий для решения аналитически сложных задач", "Процесс хранения и форматирования данных"], correct: 1 },
+        // 4
+        { type: 'choice', question: "Предсказание категории объекта по определенным и заданным заранее признакам — это ....", options: ["Задача классификации", "Задача регрессии", "Задача уменьшения размерности"], correct: 0 },
+        // 5
+        { type: 'choice', question: "В машинном обучении задача классификации решается с использованием обучения:", options: ["Без учителя", "С подкреплением", "С учителем"], correct: 2 },
+        // 6
+        { type: 'choice', question: "Ключевая особенность нейросетей:", options: ["Возможность самостоятельного выхода в интернет", "Обучение вместо классического программирования", "Использование сети подключенных друг к другу компьютеров"], correct: 1 },
+        // 7
+        { type: 'choice', question: "Что проверяет тест Тьюринга?", options: ["Насколько быстро обучается нейросеть", "Насколько успешно компьютер выдает себя за человека", "Насколько хорошо робот ориентируется на местности"], correct: 1 },
+        // 8
+        { type: 'choice', question: "Что такое «китайская комната» в теории искусственного интеллекта?", options: ["Мысленный эксперимент в области философии искусственного интеллекта", "Программа для обучения нейронных сетей", "Ограниченный искусственный интеллект"], correct: 0 },
+        // 9
+        { type: 'choice', question: "Чем отличаются сильный и слабый искусственный интеллект?", options: ["Отличаются числом связей в своей структуре", "Под слабым искусственным интеллектом понимается алгоритм, способный решать узкоспециализированные проблемы, сильный искусственный интеллект же менее ограничен в спектре задач", "Отличаются объемом памяти"], correct: 1 },
+        // 10
+        { type: 'choice', question: "Супер-искусственный интеллект представляет собой:", options: ["Интеллект, который значительно превосходит когнитивные способности человека практически во всех областях", "ИИ, схожий с человеческим интеллектом", "ИИ, направленный на решение узкоспециализированной задачи"], correct: 0 },
+        // 11
+        { type: 'choice', question: "Когда и кем был впервые использован термин искусственный интеллект (ИИ)?", options: ["В 1956 году, Джоном Маккарти", "В 1946 году, Аланом Тьюрингом", "В 1650 году, Блезом Паскалем"], correct: 0 },
+        // 12
+        { type: 'choice', question: "Аналоговая модель:", options: ["Не выглядит как реальная система, но повторяет ее поведение.", "Наименее абстрактная модель — является физической копией системы, обычно в отличном от оригинала масштабе", "Используется для оценки сценариев, которые меняются во времени"], correct: 0 },
+        // 13
+        { type: 'choice', question: "Динамическая математическая модель:", options: ["Не выглядит как реальная система, но повторяет ее поведение.", "Наименее абстрактная модель — является физической копией системы, обычно в отличном от оригинала масштабе", "Используется для оценки сценариев, которые меняются во времени"], correct: 2 },
+        // 14
+        { type: 'choice', question: "Data mining:", options: ["Фильтрация и сортировка массивов данных", "Передача разнотипной информации", "Процесс выделения из данных неявной и неструктурированной информации и представления ее в виде, пригодном для реализации"], correct: 2 },
+        // 15
+        { type: 'choice', question: "BIM (Building information modeling) моделирование — это:", options: ["Современная технология информационного 3D проектирования зданий и сооружений на всех этапах жизненного цикла проекта от разработки концепции до сноса и/или полной реконструкции", "Процесс выделения из данных неявной и неструктурированной информации и представления ее в виде, пригодном для реализации", "Упорядочивание структурированной информации или данных, которые обычно хранятся в электронном виде в компьютерной системе"], correct: 0 },
+        // 16
+        { type: 'choice', question: "OLAP — Online Analytical Processing:", options: ["Термин, используемый для описания реляционных баз данных", "Оперативная аналитическая обработка", "Оперативная обработка транзакций"], correct: 1 },
+        // 17
+        { type: 'choice', question: "Экспертная система в строительстве:", options: ["Реляционная база данных", "Интеллектуальная вычислительная система, в которую включены знания опытных специалистов (экспертов) о строительной отрасли", "Оперативная обработка транзакций в строительстве"], correct: 1 },
+        // 18
+        { type: 'choice', question: "Машинное зрение представляет собой:", options: ["Применение компьютерного зрения для промышленности и производства", "Систему алгоритмов для решения задачи регрессии", "Систему аналитики на основе нечетких множеств"], correct: 0 },
+        // 19
+        { type: 'choice', question: "Метод 3D-реконструкции в контексте технологий компьютерного зрения представляет собой:", options: ["Построение трехмерной модели объекта с помощью камер", "Отслеживание процесса строительства", "Учет показателей и контрольных сроков выполнения работ"], correct: 0 },
+        // 20
+        { type: 'choice', question: "К задаче машинного зрения не относится:", options: ["Распознавание", "Регрессия", "Восстановление 3D формы по 2D изображениям"], correct: 1 },
+        // 21
+        { type: 'choice', question: "К задаче машинного зрения относится:", options: ["Распознавание", "Регрессия", "Кластеризация"], correct: 0 },
+        // 22
+        { type: 'choice', question: "Семантическая сегментация изображений — это:", options: ["Локализация объекта на изображении", "Восстановление 3D формы по 2D изображениям", "Задача разделения частей изображения на подгруппы пикселей, принадлежащих к соответствующим объектам, с его классификацией"], correct: 2 },
+        // 23
+        { type: 'choice', question: "Автоматическое обнаружение дефектов в строительных материалах можно осуществить с помощью:", options: ["Детектора на основе сверточной нейронной сети", "Рекомендательной системы", "OLAP-технологии"], correct: 0 },
+        // 24
+        { type: 'choice', question: "Данные, которые условно относят к Big Data в строительстве, применяется для:", options: ["Оптимальных конструктивных решений зданий в целях энергосбережения", "Поиска поставщиков", "Поиска подрядчиков"], correct: 0 },
+        // 25
+        { type: 'choice', question: "Причина, по которой любые данные в строительстве не могут рассматриваться в качестве больших данных:", options: ["Централизованность хранения", "Отсутствие единой стандартизации представления данных в строительстве", "Прозрачность формата данных"], correct: 1 },
+        // 26
+        { type: 'choice', question: "Условие для формирования баз на всей совокупности данных в строительстве:", options: ["Обеспечение непрозрачности формата данных", "Все данные управляются и накапливаются децентрализовано", "Все данные управляются и накапливаются централизованно"], correct: 2 },
+        // 27
+        { type: 'choice', question: "Одно из преимуществ BIM:", options: ["Возможность совместной работы над моделью специалистов из разных стран в режиме реального времени", "Автоматический выпуск проектной документации", "Привязка процесса к единственному поставщику ПО"], correct: 0 },
+        // 28
+        { type: 'choice', question: "BIM-объект — это:", options: ["Визуальное 3D-представление компонента здания", "Строка в базе данных", "Визуальное 2D-представление компонента здания"], correct: 0 },
+        // 29 — MULTI
+        { type: 'multi', question: "Искусственный интеллект в строительстве:", options: ["Автоматизирует рутинные, но важные задачи по управлению строительством", "Помогает грамотно планировать задачи, чтобы предотвратить задержки, конфликты, сроки срывов сдачи", "Полностью исключает влияние человеческого фактора на всех стадиях строительства"], correct: [0, 1] },
+        // 30
+        { type: 'choice', question: "Умный дом — это", options: ["Автоматизированная система управления всеми приборами в доме, которые объединены в единую экосистему", "Автоматизированная система, реализующая информационную технологию выполнения функций проектирования", "Технология для визуализации жизненного цикла здания"], correct: 0 },
+        // 31
+        { type: 'choice', question: "Система автоматизированного проектирования:", options: ["Автоматизированная система, реализующая информационную технологию выполнения функций проектирования, представляет собой организационно-техническую систему, предназначенную для автоматизации процесса проектирования, состоящую из персонала и комплекса технических, программных и других средств автоматизации его деятельности", "Технология для визуализации жизненного цикла здания", "Автоматизированная система управления всеми приборами в доме, которые объединены в единую экосистему"], correct: 0 },
+        // 32
+        { type: 'choice', question: "Задача прогнозирования прочности бетона с помощью машинного обучения сводится к решению:", options: ["Задачи регрессии", "Задачи классификации", "Задачи распознавания образов"], correct: 0 },
+        // 33
+        { type: 'choice', question: "Задача кластеризации — это:", options: ["Разделение исследуемого множества объектов на группы «похожих» объектов", "Прогнозирование значения метки по набору связанных компонентов", "Разделения множества наблюдений (объектов) на группы"], correct: 0 },
+        // 34
+        { type: 'choice', question: "Задача классификации — это:", options: ["Разделение исследуемого множества объектов на группы «похожих» объектов", "Прогнозирование значения метки по набору связанных компонентов", "Разделения множества наблюдений (объектов) на группы"], correct: 2 },
+        // 35
+        { type: 'choice', question: "Задача регрессии — это:", options: ["Разделение исследуемого множества объектов на группы «похожих» объектов", "Прогнозирование значения метки по набору связанных компонентов", "Разделения множества наблюдений (объектов) на группы"], correct: 1 },
+        // 36 — TEXT
+        { type: 'text', question: "Объектно-ориентированная модель строительного объекта или комплекса строительных объектов, как правило, в трёхмерном виде, с элементами которой связаны данные геометрических, физических и функциональных характеристик строительного объекта называется:", correct: ["bim", "building information model"] },
+        // 37 — TEXT
+        { type: 'text', question: "Программный пакет, предназначенный для создания чертежей, конструкторской и/или технологической документации и/или 3D моделей, называется:", correct: ["сапр", "cad", "computer-aided design"] },
+        // 38
+        { type: 'choice', question: "К САПР (система автоматизированного проектирования) относится:", options: ["Pascal", "Revit", "Python"], correct: 1 },
+        // 39
+        { type: 'choice', question: "К САПР (система автоматизированного проектирования) не относится:", options: ["ArchiCad", "Pascal", "LibreCAD", "ЛИРА-САПР"], correct: 1 },
+        // 40
+        { type: 'choice', question: "Способ машинного обучения, в ходе которого испытуемая система (агент) обучается, взаимодействуя с некоторой средой называется:", options: ["Обучение с подкреплением", "Обучение с учителем", "Обучение без учителя"], correct: 0 },
+        // 41
+        { type: 'choice', question: "Обучение с подкреплением в строительстве применяют для:", options: ["планирования задач", "прогнозирования прочности конструкций", "детектирования трещин"], correct: 0 },
+        // 42
+        { type: 'choice', question: "Q-обучение (Q-learning) — это:", options: ["Метод, применяемый в искусственном интеллекте при агентном подходе", "Разновидность обучения при решении задачи классификации", "Обучение детекторов"], correct: 0 },
+        // 43
+        { type: 'choice', question: "Какие данные лежат в основе работы рекомендательной системы?", options: ["Данные о пользователе", "Данные об объекте рекомендаций", "Данные об объекте рекомендаций и пользователе"], correct: 2 },
+        // 44 — MULTI
+        { type: 'multi', question: "Типы рекомендательных систем:", options: ["Коллаборативная фильтрация (collaborative filtering)", "Основанные на контенте (content-based)", "Основанные на знаниях (knowledge-based)", "Гибридные (hybrid)", "Основанные на анализе выбросов (analysis of statistical outliers)"], correct: [0, 1, 2, 3] },
+        // 45 — MULTI
+        { type: 'multi', question: "Преимущества искусственного интеллекта:", options: ["Снижение рисков", "Круглосуточная доступность", "Адаптируемость", "Соблюдения этических норм и стандартов"], correct: [0, 1, 2] },
+        // 46 — TEXT
+        { type: 'text', question: "Процесс перевода всех строительных процессов в цифровой формат, а также использование современных технологий для сокращения сроков и повышения качества строительства называется:", correct: ["цифровизация", "цифровизацией"] },
+        // 47 — TEXT
+        { type: 'text', question: "Процесс развития компании, при котором внедряются технические решения, обеспечивающие ускорение и оптимизацию ключевых операций и задач называется:", correct: ["автоматизация", "автоматизацией"] },
+        // 48
+        { type: 'choice', question: "Инновация в строительстве — это:", options: ["Любое новшество для осуществления строительно-монтажных работ", "Новшество, которое существенно увеличивает результативность действующей системы осуществления строительно-монтажных работ"], correct: 1 },
+        // 49
+        { type: 'choice', question: "Transfer Learning (трансферное обучение) — это:", options: ["Способ машинного обучения, в ходе которого испытуемая система (агент) обучается, взаимодействуя с некоторой средой", "Направление машинного обучения, объединяющее алгоритмы и методы построения моделей на основе множества примеров, содержащих пары «известный вход — известный выход»", "Подраздел машинного обучения, целью которого является применение знаний, полученные из одной задачи, к другой целевой задаче"], correct: 2 },
+        // 50 — TEXT
+        { type: 'text', question: "Комплекс методов представления исходной информации и результатов анализа данных в наиболее удобной для восприятия и интерпретации форме называется:", correct: ["визуализация", "визуализацией"] },
+        // 51
+        { type: 'choice', question: "Инструмент, позволяющий контролировать график строительства, отслеживать статусы проектов и результативность разных видов работ:", options: ["Дашборд", "Дендрограмма", "Диаграмма Парето"], correct: 0 },
+        // 52
+        { type: 'choice', question: "Специальная архитектура искусственных нейронных сетей, предложенная Яном Лекуном в 1988 году и нацеленная на эффективное распознавание образов, входит в состав технологий глубокого обучения — это:", options: ["Сверточная нейронная сеть", "Вероятностная нейронная сеть", "Рекуррентная нейронная сеть"], correct: 0 },
+        // 53 — TEXT
+        { type: 'text', question: "Тип машинного обучения, который с помощью искусственных нейронных сетей обеспечивает цифровым системам возможность обучаться и принимать решения на основе неструктурированных данных без меток называется:", correct: ["глубоким", "глубокое", "глубокое обучение", "deep learning"] },
+        // 54
+        { type: 'choice', question: "К задаче классификации в строительстве относится:", options: ["Прогнозирование прочности бетона", "Определение класса бетона", "Детектирование трещин"], correct: 1 },
+        // 55
+        { type: 'choice', question: "К задаче компьютерного зрения в строительстве относится:", options: ["Прогнозирование прочности бетона", "Определение класса бетона", "Детектирование трещин"], correct: 2 },
+        // 56
+        { type: 'choice', question: "К задаче регрессии в строительстве относится:", options: ["Прогнозирование прочности бетона", "Определение класса бетона", "Детектирование трещин"], correct: 0 },
+        // 57
+        { type: 'choice', question: "Сегментация трещин в строительных конструкциях относится к:", options: ["Задаче регрессии", "Задаче компьютерного зрения", "Задаче кластеризации"], correct: 1 },
+        // 58 — MULTI
+        { type: 'multi', question: "Модель глубокой сверточной нейронной сети в задаче сегментации трещин на изображениях строительных конструкций требует:", options: ["Большого набора данных для обучения", "Мощных вычислительных ресурсов", "Удаления «шумов» на изображении в ручном режиме"], correct: [0, 1] },
+        // 59
+        { type: 'choice', question: "Искусственный интеллект, робототехника и Интернет вещей могут снизить затраты на строительство на:", options: ["1%", "5%", "20%", "70%"], correct: 2 },
+        // 60
+        { type: 'choice', question: "Цифровой двойник — это:", options: ["Виртуальная модель здания, которая собирает информацию с помощью датчиков, дронов и других беспроводных технологий", "Модель здания, построенная в САПР", "Чертеж здания на бумажном носителе"], correct: 0 },
+        // 61 — TEXT
+        { type: 'text', question: "Автоматизированное производство на специально оборудованных заводах деталей или укрупнённых блоков сборных конструкций, их транспортировку к месту строительства и монтаж называется:", correct: ["сборное", "сборное строительство"] },
+        // 62
+        { type: 'choice', question: "Преимущество реконструкции изображений на основе искусственного интеллекта:", options: ["Кроссплатформенность", "Минимальные нагрузки на вычислительные ресурсы", "Быстрота"], correct: 2 },
+        // 63
+        { type: 'choice', question: "Архитектура, состоящая из генератора и дискриминатора, настроенных на работу друг против друга, называется:", options: ["Генеративно-состязательная нейронная сеть (GAN)", "Сверточная нейронная сеть (CNN)", "Рекуррентная нейронная сеть (RNN)"], correct: 0 },
+        // 64
+        { type: 'choice', question: "Вид нейронных сетей, где связи между элементами образуют направленную последовательность:", options: ["Генеративно-состязательная нейронная сеть (GAN)", "Сверточная нейронная сеть (CNN)", "Рекуррентная нейронная сеть (RNN)"], correct: 2 },
+        // 65 — TEXT
+        { type: 'text', question: "Предсказание будущих событий, явлений, состояний различных объектов и процессов называется:", correct: ["прогнозированием", "прогнозирование"] },
+        // 66
+        { type: 'choice', question: "Первые программные инструменты, разработанные для моделирования зданий, появились:", options: ["в начале 2000-х годов", "в конце 1960-х и начале 1970-х годов", "в конце 1970-х и начале 1980-х годов"], correct: 2 },
+        // 67
+        { type: 'choice', question: "Клиентов строительной индустрии можно проанализировать с помощью:", options: ["XYZ анализа", "A/B тестирования", "Бенчмаркинга"], correct: 1 },
+        // 68
+        { type: 'choice', question: "Процесс исключения из данных различных факторов, снижающих их качество и мешающих их корректному анализу, называется:", options: ["Очисткой данных", "Консолидацией данных", "Кластеризацией данных"], correct: 0 },
+        // 69
+        { type: 'choice', question: "Впервые многослойный персептрон был предложен:", options: ["Ф. Розенлаттом", "Б. Паскалем", "А. Тьюрингом"], correct: 0 },
+        // 70
+        { type: 'choice', question: "Аугментация данных при решении задач компьютерного зрения в строительстве позволяет:", options: ["Увеличить скорость обучения модели", "Уменьшить нагрузку вычислительных ресурсов", "Улучшить обобщающую способность модели"], correct: 2 }
+    ];
+
+    // ================================================================
+    //  ФУНКЦИЯ ПЕРЕМЕШИВАНИЯ ВАРИАНТОВ
+    // ================================================================
+    function shuffleOptions(q) {
+        if (q.type === 'text') return q;
+
+        const options = q.options;
+        const correct = q.correct;
+        const indices = options.map((_, i) => i);
+
+        for (let i = indices.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [indices[i], indices[j]] = [indices[j], indices[i]];
+        }
+
+        const newOptions = indices.map(i => options[i]);
+        let newCorrect;
+        if (Array.isArray(correct)) {
+            newCorrect = correct.map(oldIdx => indices.indexOf(oldIdx)).sort((a, b) => a - b);
+        } else {
+            newCorrect = indices.indexOf(correct);
+        }
+
+        return { ...q, options: newOptions, correct: newCorrect };
+    }
+
+    // ================================================================
+    //  ЛОГИКА
+    // ================================================================
+    let state = {
+        questions: [],
+        currentIndex: 0,
+        score: 0,
+        maxScore: 0,
+        answered: false,
+        total: 0,
+        selectedMulti: []
+    };
+
+    const mainContent = document.getElementById('mainContent');
+    const progressText = document.getElementById('progressText');
+    const scoreText = document.getElementById('scoreText');
+    const progressFill = document.getElementById('progressFill');
+    const qType = document.getElementById('qType');
+    const qNum = document.getElementById('qNum');
+    const qText = document.getElementById('qText');
+    const optionsContainer = document.getElementById('optionsContainer');
+    const nextBtn = document.getElementById('nextBtn');
+    const resetBtn = document.getElementById('resetBtn');
+
+    function shuffle(arr) {
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    }
+
+    function init() {
+        const shuffledQuestions = QUESTIONS_RAW.map(q => shuffleOptions(q));
+        state.questions = shuffle(shuffledQuestions);
+        state.currentIndex = 0;
+        state.score = 0;
+        state.maxScore = state.questions.length;
+        state.answered = false;
+        state.total = state.questions.length;
+        state.selectedMulti = [];
+        renderQuestion();
+    }
+
+    function renderQuestion() {
+        const q = state.questions[state.currentIndex];
+        if (!q) { showFinish(); return; }
+
+        const idx = state.currentIndex;
+        const total = state.total;
+        progressText.textContent = `Вопрос ${idx + 1} / ${total}`;
+        updateScoreDisplay();
+        progressFill.style.width = `${((idx) / total) * 100}%`;
+
+        qNum.textContent = `Вопрос №${idx + 1}`;
+        qText.textContent = q.question;
+        state.answered = false;
+        state.selectedMulti = [];
+        nextBtn.disabled = true;
+        nextBtn.textContent = 'Далее →';
+
+        if (q.type === 'text') {
+            qType.textContent = '✏️ Ввод ответа';
+            renderTextInput(q);
+        } else if (q.type === 'multi') {
+            qType.textContent = '☑️ Несколько вариантов';
+            renderMultiChoice(q);
+            nextBtn.textContent = '✅ Проверить';
+        } else {
+            qType.textContent = '🔘 Выбор ответа';
+            renderSingleChoice(q);
+        }
+    }
+
+    function updateScoreDisplay() {
+        scoreText.textContent = `⭐ ${state.score.toFixed(1)} / ${state.maxScore}`;
+    }
+
+    // ---------- SINGLE CHOICE ----------
+    function renderSingleChoice(q) {
+        optionsContainer.innerHTML = '';
+        const letters = ['А', 'Б', 'В', 'Г', 'Д', 'Е'];
+        q.options.forEach((opt, i) => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerHTML = `<span class="letter">${letters[i] || i + 1}</span><span>${opt}</span>`;
+            btn.dataset.index = i;
+            btn.addEventListener('click', () => handleSingleClick(i, q));
+            optionsContainer.appendChild(btn);
+        });
+    }
+
+    function handleSingleClick(selected, q) {
+        if (state.answered) return;
+        const btns = optionsContainer.querySelectorAll('.option-btn');
+        const correct = q.correct;
+
+        btns.forEach((btn, i) => {
+            btn.classList.add('disabled');
+            if (i === correct) btn.classList.add('correct');
+            else if (i === selected && i !== correct) btn.classList.add('wrong');
+        });
+
+        if (selected === correct) state.score += 1;
+
+        state.answered = true;
+        nextBtn.disabled = false;
+        updateScoreDisplay();
+    }
+
+    // ---------- MULTI CHOICE ----------
+    function renderMultiChoice(q) {
+        optionsContainer.innerHTML = '';
+        const letters = ['А', 'Б', 'В', 'Г', 'Д', 'Е'];
+        q.options.forEach((opt, i) => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerHTML = `<span class="letter">${letters[i] || i + 1}</span><span>${opt}</span>`;
+            btn.dataset.index = i;
+            btn.addEventListener('click', () => handleMultiClick(i));
+            optionsContainer.appendChild(btn);
+        });
+
+        const hint = document.createElement('div');
+        hint.className = 'multi-hint';
+        hint.textContent = '💡 Выберите все правильные варианты.';
+        optionsContainer.appendChild(hint);
+    }
+
+    function handleMultiClick(selected) {
+        if (state.answered) return;
+        const btns = optionsContainer.querySelectorAll('.option-btn');
+        const idx = state.selectedMulti.indexOf(selected);
+        if (idx === -1) {
+            state.selectedMulti.push(selected);
+            btns[selected].classList.add('selected');
+        } else {
+            state.selectedMulti.splice(idx, 1);
+            btns[selected].classList.remove('selected');
+        }
+        nextBtn.disabled = false;
+    }
+
+    function submitMulti() {
+        if (state.answered) return;
+        const q = state.questions[state.currentIndex];
+        const btns = optionsContainer.querySelectorAll('.option-btn');
+        const correct = q.correct;
+        const selected = state.selectedMulti;
+
+        const totalCorrect = correct.length;
+        const pointsPerCorrect = 1 / totalCorrect;
+
+        let earned = 0;
+        btns.forEach((btn, i) => {
+            btn.classList.add('disabled');
+            if (correct.includes(i)) {
+                btn.classList.add('correct');
+                if (selected.includes(i)) {
+                    earned += pointsPerCorrect;
+                }
+            } else if (selected.includes(i) && !correct.includes(i)) {
+                btn.classList.add('wrong');
+            }
+            btn.classList.remove('selected');
+        });
+
+        state.score += earned;
+        state.answered = true;
+        nextBtn.disabled = false;
+        nextBtn.textContent = 'Далее →';
+        updateScoreDisplay();
+    }
+
+    // ---------- TEXT INPUT ----------
+    function renderTextInput(q) {
+        optionsContainer.innerHTML = '';
+        const div = document.createElement('div');
+        div.className = 'input-area';
+
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.placeholder = 'Введите ваш ответ...';
+        input.id = 'textInput';
+        input.autocomplete = 'off';
+
+        const feedback = document.createElement('div');
+        feedback.className = 'input-feedback';
+        feedback.id = 'textFeedback';
+
+        const submitBtn = document.createElement('button');
+        submitBtn.className = 'submit-text-btn';
+        submitBtn.textContent = '✅ Ответить';
+        submitBtn.id = 'submitTextBtn';
+
+        div.appendChild(input);
+        div.appendChild(feedback);
+        div.appendChild(submitBtn);
+        optionsContainer.appendChild(div);
+
+        const checkText = () => submitText(q);
+        input.addEventListener('keydown', (e) => { if (e.key === 'Enter') checkText(); });
+        submitBtn.addEventListener('click', checkText);
+    }
+
+    function submitText(q) {
+        if (state.answered) return;
+        const input = document.getElementById('textInput');
+        const feedback = document.getElementById('textFeedback');
+        const submitBtn = document.getElementById('submitTextBtn');
+        if (!input || !feedback) return;
+
+        const userAnswer = input.value.trim().toLowerCase();
+        const correctAnswers = q.correct.map(s => s.toLowerCase());
+
+        const isCorrect = correctAnswers.some(c => userAnswer === c);
+
+        input.disabled = true;
+        submitBtn.disabled = true;
+        if (isCorrect) {
+            input.classList.add('correct-input');
+            feedback.textContent = '✅ Правильно! +1 балл';
+            feedback.className = 'input-feedback correct';
+            state.score += 1;
+        } else {
+            input.classList.add('wrong-input');
+            feedback.textContent = `❌ Неправильно. Правильный ответ: ${q.correct[0]}`;
+            feedback.className = 'input-feedback wrong';
+        }
+
+        state.answered = true;
+        nextBtn.disabled = false;
+        updateScoreDisplay();
+    }
+
+    // ---------- ОБЩЕЕ ----------
+    nextBtn.addEventListener('click', () => {
+        const q = state.questions[state.currentIndex];
+        if (q && q.type === 'multi' && !state.answered) {
+            submitMulti();
+            return;
+        }
+        if (q && q.type === 'text' && !state.answered) {
+            return;
+        }
+        if (!state.answered) return;
+        state.currentIndex++;
+        if (state.currentIndex >= state.total) {
+            showFinish();
+        } else {
+            renderQuestion();
+        }
+    });
+
+    function showFinish() {
+        const total = state.total;
+        const earned = state.score;
+        const maxScore = state.maxScore;
+        const pct = Math.round((earned / maxScore) * 100);
+
+        mainContent.innerHTML = `
+            <div class="finish-box">
+                <h2>🎯 Тест завершён!</h2>
+                <div class="big-score">${earned.toFixed(1)} / ${maxScore}</div>
+                <p class="score-detail">⭐ <span>${pct}%</span> правильных ответов</p>
+                <p class="score-detail">📊 Баллы: <span>${earned.toFixed(1)}</span> из ${maxScore}</p>
+                <p class="score-detail" style="font-size:0.95rem; color:#6b7280;">
+                    ${pct >= 80 ? '🏆 Отлично!' : pct >= 60 ? '👍 Хорошо!' : pct >= 40 ? '📖 Учите дальше!' : '💪 Попробуйте ещё раз!'}
+                </p>
+                <button class="reset-btn" id="resetFinishBtn">🔄 Пройти заново</button>
+            </div>
+        `;
+        progressFill.style.width = '100%';
+        progressText.textContent = 'Готово!';
+        scoreText.textContent = `⭐ ${earned.toFixed(1)} / ${maxScore}`;
+        document.getElementById('resetFinishBtn').addEventListener('click', () => location.reload());
+        nextBtn.style.display = 'none';
+        document.getElementById('resetBtn').style.display = 'none';
+    }
+
+    function resetAll() { location.reload(); }
+
+    resetBtn.addEventListener('click', resetAll);
+
+    init();
+</script>
+</body>
+</html>
